@@ -147,7 +147,7 @@ do while(rt<rmax)
  ddr = (newr-oldr)/dt
  rt=newr
 ! write(*,'(8(f20.10,1X))')time,newr,ecoll*27.211d0,val(fsta)*27.211d0,ecoll*27.211d0+val(fsta)*27.211d0!0.5d0*(mass(1)*mass(2)/(mass(1)+mass(2)))*ddr**2,ddr
-! write(200,'(4(f20.10,1X),i3)')time,newr,ecoll*27.211d0,val(fsta)*27.211d0,fsta!ddr,ddrold,fsta
+! write(200,'(4(f20.10,1X),i3)')time,newr!,ecoll*27.211d0,val(fsta)*27.211d0,fsta!ddr,ddrold,fsta
  do ista=1,nsta
   call db1val(newr,idr,tr(ista,:),nr,kr,energy(ista,:),val(ista),iflag,inbvx)
 
@@ -173,13 +173,16 @@ do while(rt<rmax)
 
  do ista=1,nsta 
   if(d_epair(ista)*d_epair_t1(ista) < 0d0 .and. d2_epair(ista)>0d0 .and. ddr*ddrold>0d0) then  ! ddr*ddrold>0d0  <=> no hopping at the turning point
-   plz = exp(-0.5d0*pi*sqrt(epair(ista)**3/d2_epair(ista)))
+   plz = exp(-0.5d0*pi*sqrt(abs(epair(ista))**3/d2_epair(ista)))
 !  write(*,'(200(f20.10,1X))')time,newr,epair(ista),plz,ddr,ddrold
+!  write(*,'(200(f20.10,1X))')time,newr,plz,float(ista)!, epair(ista), epair_t1(ista), float(fsta), d2_epair(ista)
+!  plz = 0d0
 
 ! is there enough kinetic energy to fill the energy gap, if not => frustrated hop
       ekin1 = 0d0
         do i = 1, npart
-          do j = 1, 3
+!nico yz          do j = 1, 3
+         do j = 2, 3
              vunscal = (xyzt(j,i)-xyzm(j,i))/dt
              ekin1 = ekin1 + 0.5d0*mass(i)*vunscal**2
           enddo
@@ -196,9 +199,10 @@ do while(rt<rmax)
           ekin2 = 0d0
           scal = egap/6d0 ! the velocities scaled evenly in the collision plane (i.e. energy gap is spread over all 6 coord. e.g.  xOz)
           do i = 1, npart
-            do j = 1, 3 
+!nico yz          do j = 1, 3
+         do j = 2, 3
              vunscal = (xyzt(j,i)-xyzm(j,i))/dt
-             if(vunscal/=0d0) then
+!nico yz             if(vunscal/=0d0) then
                ekin1 = ekin1 + 0.5d0*mass(i)*vunscal**2
                if(1d0+2d0*scal/(mass(i)*vunscal**2)>0d0) then
                   vscal = vunscal*sqrt(1d0+2d0*scal/(mass(i)*vunscal**2))
@@ -209,7 +213,7 @@ do while(rt<rmax)
                vunscal = (xyzt(j,i)-xyzm(j,i))/dt
 !               write(*,*)vunscal
                ekin2 = ekin2 + 0.5d0*mass(i)*vunscal**2
-             endif
+!nico yz             endif
            enddo
           enddo
 !        write(*,*)"Ekin_unscal,Ekinscal,Energy conservation",ekin1*27.211d0, ekin2*27.211d0, (ekin2-egap-ekin1)*27.211d0
@@ -229,7 +233,8 @@ do while(rt<rmax)
 ! computes the new position
  ecoll = 0d0
  do i = 1, npart
-   do j = 1, 3
+!nico yz          do j = 1, 3
+         do j = 2, 3
   
     xyzdr(:,:) =  xyzt(:,:) 
     xyzdr(j,i) = xyzt(j,i) + dr
@@ -262,11 +267,21 @@ do while(rt<rmax)
  time = time + dt
 
 enddo
-   write(*,*)fsta,newr
+!   write(*,*)fsta,newr
 !stop
 
 xyz(:,:) = xyznew(:,:)
 vxyz(:,:) = (xyzt(:,:)-xyzm(:,:))/dt
+
+ekin1 = 0d0
+do i = 1, npart
+!nico yz          do j = 1, 3
+  do j = 2, 3
+     vunscal = (xyzt(j,i)-xyzm(j,i))/dt
+     ekin1 = ekin1 + 0.5d0*mass(i)*vunscal**2
+  enddo
+enddo
+write(*,'(i2,100(f20.16,1X))')fsta,ekin1*27.211d0,newr,xyz(:,:),vxyz(:,:)
 
 deallocate(r,energy)
 deallocate(tr)
