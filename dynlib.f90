@@ -281,7 +281,7 @@ do i = 1, npart
      ekin1 = ekin1 + 0.5d0*mass(i)*vunscal**2
   enddo
 enddo
-write(*,'(i2,100(f20.16,1X))')fsta,ekin1*27.211d0,newr,xyz(:,:),vxyz(:,:)
+write(*,'(i4,1X,100(f20.16,1X))')fsta,ekin1*27.211d0,newr,xyz(:,:),vxyz(:,:)
 
 deallocate(r,energy)
 deallocate(tr)
