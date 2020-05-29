@@ -30,15 +30,6 @@ enddo
     stop
   endif
 
-! add up 1/R0 to last particule along z
- ecoll = 0.5d0*mass(2)*vxyz(3,2)**2 
-! write(*,*)rmax,ecoll*27.211d0
- ecoll = ecoll + 1d0/rmax
-! write(*,*)rmax,ecoll*27.211d0
- vxyz(3,2) = sqrt(2d0*ecoll/mass(2))
- ecoll = 0.5d0*mass(2)*vxyz(3,2)**2 
-! write(*,*)rmax,ecoll*27.211d0
-
 ! starts with the dynamics
 
  ti = 0d0

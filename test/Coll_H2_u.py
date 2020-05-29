@@ -12,7 +12,7 @@ ista=sys.argv[3]
 
 # hard-coded parameters (should be adjusted for each system)
 
-ecoll=100.0 # eV
+ecoll=1.0 # eV
 ecollau=ecoll/27.211
 m=1.0
 v=np.sqrt(2.0*ecollau/(m*1836.15))
@@ -62,7 +62,7 @@ for b in blist:
   print >> finp, m,0.0,0.0,0.0,0.0,0.0,0.0
   print >> finp, m,0.0,b,z0,0.0,0.0,v
   finp.close()
-  os.system('/home/nico/Workspace/Propag_LZSH_1D/dyn < traj > a')
+  os.system('/home/nico/Workspace/Propag_LZSH_1D/dyn_stable < traj > a')
 
 #  os.system('/home/nico/Results/Patrik/lzsh_sources/dyn < traj > a')
 #  cmd='cp a traj'+str(j) 

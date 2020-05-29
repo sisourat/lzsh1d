@@ -12,7 +12,7 @@ implicit none
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! for the dynamics
-double precision, parameter :: dt = 5d0, dr = 0.05d0  ! in atomic units
+double precision, parameter :: dt = 40d0, dr = 0.05d0  ! in atomic units
 double precision, intent(inout) :: ti, rmax
 double precision, dimension(3,npart) :: xyzm, xyzt, xyznew, xyzdr
 double precision :: time, grade, ecoll, ekin1, ekin2, egap, vunscal, vscal, scal
@@ -79,7 +79,6 @@ do i = 1, nr
    r(i) = r(i)*1.889725989d0
   endif
   if(ue=='eV' .or. ue=='ev' .or. ue=='EV') then
-   write(*,*)ue,ur
    energy(:,i) = energy(:,i)/27.211385d0
   endif
 enddo 
@@ -120,6 +119,17 @@ do ista=1,nsta
  endif
 enddo
 
+! add up 1/R0 to last particule along z
+ ecoll = 0.5d0*mass(2)*vxyz(3,2)**2
+! write(*,*)newr,ecoll*27.211d0
+ ecoll = ecoll + 1d0/newr
+! write(*,*)newr,ecoll*27.211d0
+! ecoll = ecoll + val(fsta)
+! write(*,*)newr,ecoll*27.211d0
+ vxyz(3,2) = sqrt(2d0*ecoll/mass(2))
+ ecoll = 0.5d0*mass(2)*vxyz(3,2)**2
+! write(*,*)newr,ecoll*27.211d0
+
 do ista=1,nsta
   epair(ista) = abs(val(ista)-val(fsta))
 enddo
@@ -147,7 +157,7 @@ do while(rt<rmax)
  ddr = (newr-oldr)/dt
  rt=newr
 ! write(*,'(8(f20.10,1X))')time,newr,ecoll*27.211d0,val(fsta)*27.211d0,ecoll*27.211d0+val(fsta)*27.211d0!0.5d0*(mass(1)*mass(2)/(mass(1)+mass(2)))*ddr**2,ddr
-! write(200,'(4(f20.10,1X),i3)')time,newr!,ecoll*27.211d0,val(fsta)*27.211d0,fsta!ddr,ddrold,fsta
+! write(200,'(5(f20.10,1X),i3)')time,newr,ecoll*27.211d0,val(fsta)*27.211d0,(ecoll+val(fsta))*27.211d0,fsta!ddr,ddrold,fsta
  do ista=1,nsta
   call db1val(newr,idr,tr(ista,:),nr,kr,energy(ista,:),val(ista),iflag,inbvx)
 
@@ -175,7 +185,7 @@ do while(rt<rmax)
   if(d_epair(ista)*d_epair_t1(ista) < 0d0 .and. d2_epair(ista)>0d0 .and. ddr*ddrold>0d0) then  ! ddr*ddrold>0d0  <=> no hopping at the turning point
    plz = exp(-0.5d0*pi*sqrt(abs(epair(ista))**3/d2_epair(ista)))
 !  write(*,'(200(f20.10,1X))')time,newr,epair(ista),plz,ddr,ddrold
-!  write(*,'(200(f20.10,1X))')time,newr,plz,float(ista)!, epair(ista), epair_t1(ista), float(fsta), d2_epair(ista)
+!  if(plz>1d-8) write(*,'(200(f20.10,1X))')time,newr,plz,float(ista),float(fsta)!, epair(ista), epair_t1(ista), float(fsta), d2_epair(ista)
 !  plz = 0d0
 
 ! is there enough kinetic energy to fill the energy gap, if not => frustrated hop
@@ -253,8 +263,9 @@ do while(rt<rmax)
  enddo
 !    write(*,'(i4,i4,2(f20.15))')j,i,newr,valdrm(fsta)
 
-    grade = 0.5*( (valdrp(fsta)-val(fsta))/dr - (valdrm(fsta)-val(fsta))/dr )
-!    write(*,'(i4,i4,2(f20.15))')j,i,grade,newr
+!    grade = 0.5*( (valdrp(fsta)-val(fsta))/dr - (valdrm(fsta)-val(fsta))/dr )
+    grade =  0.5*(valdrp(fsta)-valdrm(fsta))/dr 
+!    write(200,'(i4,i4,2(f20.15))')j,i,grade,newr
     xyznew(j,i) = 2*xyzt(j,i) - xyzm(j,i) - grade*dt**2/mass(i) 
     vxyz(j,i) = (xyzt(j,i) - xyzm(j,i))/dt
     ecoll = ecoll + 0.5d0*mass(i)*((xyzt(j,i) - xyzm(j,i))/dt)**2

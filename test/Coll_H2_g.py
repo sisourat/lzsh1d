@@ -12,16 +12,16 @@ ista=sys.argv[3]
 
 # hard-coded parameters (should be adjusted for each system)
 
-ecoll=100.0 # eV
+ecoll=0.1 # eV
 ecollau=ecoll/27.211
 m=1.0
 v=np.sqrt(2.0*ecollau/(m*1836.15))
 
-z0=-40.0
+z0=-60.0
 bmin=2.0    # au
 bmax = 38.0 # au
 nb = 72
-ntraj = 200
+ntraj = 100
 blist=np.linspace(bmin,bmax,num=nb)
 kerbins = [0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0]
 dker=0.2
@@ -62,7 +62,7 @@ for b in blist:
   print >> finp, m,0.0,0.0,0.0,0.0,0.0,0.0
   print >> finp, m,0.0,b,z0,0.0,0.0,v
   finp.close()
-  os.system('/home/nico/Workspace/Propag_LZSH_1D/dyn < traj > a')
+  os.system('/home/nico/Workspace/Propag_LZSH_1D/dyn_stable < traj > a')
 
 #  os.system('/home/nico/Results/Patrik/lzsh_sources/dyn < traj > a')
 #  cmd='cp a traj'+str(j) 
@@ -80,6 +80,7 @@ for b in blist:
    sys.exit()
    
   wsave.append(w[0])
+ # print w[0]
   if(not(w[0]==ista)):
    pb+=1.0
    kertot.append(float(w[1])-ecoll)
