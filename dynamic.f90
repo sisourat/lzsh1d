@@ -14,12 +14,14 @@ character(64) :: fpot
 integer :: i, j, l
 
 ! reads the initial conditions
-  read(*,*)fpot, rmax, fsta
-do i = 1, npart
-  read(*,*)mass(i),xyz(1,i),xyz(2,i),xyz(3,i),vxyz(1,i),vxyz(2,i),vxyz(3,i)
+ open(unit=10,file="traj")
+  read(10,*)fpot, rmax, fsta
+ do i = 1, npart
+  read(10,*)mass(i),xyz(1,i),xyz(2,i),xyz(3,i),vxyz(1,i),vxyz(2,i),vxyz(3,i)
 !  write(100,'(6(f20.15,1X))')xyz(1,i),xyz(2,i),xyz(3,i),vxyz(1,i),vxyz(2,i),vxyz(3,i)
   mass(i)=mass(i)*1836.15d0
-enddo
+ enddo
+ close(10)
 
   if(vxyz(1,1) /= 0d0 .or. vxyz(2,1) /= 0d0 .or. vxyz(3,1) /= 0d0) then
     write(*,*)"First atom should be fixed"
